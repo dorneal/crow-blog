@@ -1,0 +1,17 @@
+body{
+	background: #FCFCFE;
+}
+.avatar-size{
+	height: 100px;
+}
+.main{
+	margin-top: 4rem;
+}
+.mycard{
+	background: none;
+	border: none;
+}
+.myInfo-size{
+	min-width: 15rem;
+}
+

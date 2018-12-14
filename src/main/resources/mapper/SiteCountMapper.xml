@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="per.neal.blog.dao.SiteCountMapper">
+    <select id="articleCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM tb_article
+        WHERE article_status = '1'
+    </select>
+    <select id="commentCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM tb_comment
+    </select>
+    <select id="visitorCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM tb_visitor
+    </select>
+    <select id="columnCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM tb_column
+    </select>
+    <select id="likeCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM tb_like
+    </select>
+    <select id="countAll" resultType="per.neal.blog.entity.TbSite">
+        SELECT id, visit_count, article_count, comment_count, like_count, tags_count
+        FROM tb_site
+    </select>
+    <update id="updateCount" parameterType="per.neal.blog.entity.TbSite">
+        UPDATE tb_site
+        <set>
+            <if test="visitCount!=null">visit_count=#{visitCount},</if>
+            <if test="articleCount!=null">article_count=#{articleCount},</if>
+            <if test="commentCount!=null">comment_count=#{commentCount},</if>
+            <if test="likeCount!=null">like_count=#{likeCount},</if>
+            <if test="tagsCount!=null">tags_count=#{tagsCount},</if>
+        </set>
+        WHERE id=1
+    </update>
+</mapper>

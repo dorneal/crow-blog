@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="per.neal.blog.dao.ArticleMapper">
+    <sql id="baseSql">
+        id,
+        title,
+        description,
+        content,
+        create_time,
+        column_id,
+        article_status,
+        article_tag
+    </sql>
+    <select id="listArticle" resultType="per.neal.blog.entity.TbArticle">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        WHERE article_status='1'
+    </select>
+    <select id="countArticle" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM tb_article
+    </select>
+    <select id="findArticleById" resultType="per.neal.blog.entity.TbArticle">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        WHERE id=#{id}
+    </select>
+    <update id="updateArticle" parameterType="per.neal.blog.entity.TbArticle">
+        UPDATE tb_article
+        <set>
+            <if test="title!=null">title=#{title},</if>
+            <if test="description!=null">description=#{description},</if>
+            <if test="content!=null">content=#{content},</if>
+            <if test="createTime!=null">create_time=#{createTime},</if>
+            <if test="columnId!=null">column_id=#{columnId},</if>
+            <if test="articleTag!=null">article_tag=#{articleTag},</if>
+            <if test="articleStatus!=null">article_status=#{articleStatus},</if>
+        </set>
+        WHERE id=#{id}
+    </update>
+    <update id="removeArticle" parameterType="java.lang.Long">
+        UPDATE tb_article
+        SET article_status='0'
+        WHERE id = #{id}
+    </update>
+    <update id="enableArticle" parameterType="java.lang.Long">
+        UPDATE tb_article
+        SET article_status='1'
+        WHERE id = #{id}
+    </update>
+    <insert id="newArticle" parameterType="per.neal.blog.entity.TbArticle" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_article(title, description, content, create_time,
+                               column_id, article_status, article_tag)
+        VALUES (#{title}, #{description}, #{content}, #{createTime}, #{columnId},
+                #{articleStatus}, #{articleTag})
+    </insert>
+    <select id="newestArticle" resultType="per.neal.blog.entity.TbArticle">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        WHERE article_status='1'
+        ORDER BY create_time DESC
+        LIMIT 6
+    </select>
+    <select id="countByTitle" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM tb_article
+        WHERE title = #{title}
+    </select>
+    <select id="listByColumnId" resultType="per.neal.blog.entity.TbArticle" parameterType="java.lang.Long">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        WHERE column_id=#{columnId}
+    </select>
+    <select id="countByColumnId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM tb_article
+        WHERE column_id = #{columnId}
+    </select>
+    <select id="pagination" resultType="per.neal.blog.entity.TbArticle">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        LIMIT #{offset},#{pageSize}
+    </select>
+    <select id="paginationByCondition" resultType="per.neal.blog.entity.TbArticle">
+        SELECT
+        <include refid="baseSql"/>
+        FROM tb_article
+        <where>
+            <if test="articleTitle!=null">title LIKE CONCAT('%',#{articleTitle},'%')</if>
+        </where>
+        LIMIT #{offset},#{pageSize}
+    </select>
+    <select id="countArticleByKeywords" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM tb_article
+        <where>
+            <if test="articleTitle!=null">title LIKE CONCAT('%',#{articleTitle},'%')</if>
+        </where>
+    </select>
+    <select id="rankByVisit" resultType="per.neal.blog.entity.ArticleRankModel">
+        SELECT tba.id    AS id,
+               tba.title AS title,
+               COUNT(*)  AS articleCount
+        FROM tb_article tba
+                 LEFT JOIN tb_watch tbw ON (tbw.article_Id = tba.id)
+        WHERE tba.article_status = '1'
+        GROUP BY tba.id
+        ORDER BY articleCount DESC
+        LIMIT 3
+    </select>
+    <select id="rankByLike" resultType="per.neal.blog.entity.ArticleRankModel">
+        SELECT tba.id    AS id,
+               tba.title AS title,
+               COUNT(*)  AS articleCount
+        FROM tb_article tba
+                 LEFT JOIN tb_like tbl ON (tbl.article_Id = tba.id)
+        WHERE tba.article_status = '1'
+        GROUP BY tba.id
+        ORDER BY articleCount DESC
+        LIMIT 3
+    </select>
+</mapper>

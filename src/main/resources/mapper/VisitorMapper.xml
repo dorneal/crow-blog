@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="per.neal.blog.dao.VisitorMapper">
+    <insert id="saveVisitor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_visitor (visit_time, visit_times, visitor_ip, visitor_location)
+        VALUES (#{visitTime}, #{visitTimes}, #{visitorIp}, #{visitorLocation})
+    </insert>
+    <update id="updateVisitTimes">
+        UPDATE tb_visitor
+        SET visit_times = visit_times + 1
+        WHERE id = #{id}
+    </update>
+    <update id="updateByIp">
+        UPDATE tb_visitor
+        SET visit_times = visit_times + 1
+        WHERE visitor_ip = #{ip}
+    </update>
+    <update id="updateInfo">
+        UPDATE tb_visitor
+        <set>
+            <if test="visitorName!=null">visitor_name=#{visitorName},</if>
+            <if test="visitorEmail!=null">visitor_email=#{visitorEmail},</if>
+        </set>
+        WHERE id=#{id}
+    </update>
+    <select id="listVisitor" resultType="per.neal.blog.entity.TbVisitor">
+        SELECT id, visit_time,visit_times, visitor_ip, visitor_location
+        FROM tb_visitor
+    </select>
+    <select id="findByIp" resultType="per.neal.blog.entity.TbVisitor">
+        SELECT id, visit_time,visit_times, visitor_ip, visitor_location,visitor_email,visitor_name
+        FROM tb_visitor
+        WHERE visitor_ip = #{ip}
+    </select>
+    <select id="countVisitorByIp" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM tb_visitor
+        WHERE visitor_ip = #{ip}
+    </select>
+    <select id="paginationByLocation" resultType="per.neal.blog.entity.TbVisitor"
+            parameterType="per.neal.blog.entity.TbVisitor">
+        SELECT id, visit_time,visit_times, visitor_ip, visitor_location,visitor_name,visitor_email
+        FROM tb_visitor
+        <where>
+            <if test="visitorLocation!=null">visitor_location LIKE CONCAT('%',#{visitorLocation},'%')</if>
+        </where>
+    </select>
+    <select id="listByEmail" resultType="per.neal.blog.entity.TbVisitor">
+        SELECT id, visit_time,visit_times, visitor_ip, visitor_location,visitor_name,visitor_email
+        FROM tb_visitor
+        WHERE visitor_email = #{email}
+    </select>
+</mapper>

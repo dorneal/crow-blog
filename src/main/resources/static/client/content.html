@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>neal的博客</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../plugin/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/client-index.css">
+</head>
+<body ng-app="crowBlog" ng-controller="contentController" ng-init="initBlog();initArticle();whetherLike()">
+<section class="container main">
+    <div class="row">
+        <!-- 个人信息区域 -->
+        <aside class="col-md-2 mb-3 myInfo-size">
+            <div class=" shadow-sm border rounded pt-3">
+                <div class="text-center mb-2">
+                    <a href="../index.html">
+                        <img ng-src="{{blogger.avatar}}" alt="头像"
+                             class="avatar-size rounded-circle"></a>
+                </div>
+                <div class="text-center ">
+                    <h5 class="font-weight-normal">{{blogger.blogName}}</h5>
+                    <p class="font-italic">{{blogger.perSign}}</p>
+                </div>
+                <div class="pr-3 pl-3 pb-3">
+                    <div class="d-flex flex-row text-secondary">
+                        <div class=" flex-fill  text-center" data-toggle="tooltip" data-placement="top"
+                             title="访问量">
+                            <span>{{blog.visitCount||0}}</span><br>
+                            <span><i class="fa fa-fire" aria-hidden="true"></i></span>
+                        </div>
+                        <div class=" flex-fill  border-right border-left text-center" data-toggle="tooltip"
+                             data-placement="top" title="文章数">
+                            <span>{{blog.articleCount||0}}</span><br>
+                            <span><i class="fa fa-file" aria-hidden="true"></i></span>
+                        </div>
+                        <div class="flex-fill  text-center border-right" data-toggle="tooltip" data-placement="top"
+                             title="栏目数">
+                            <span>{{blog.tagsCount||0}}</span><br>
+                            <span><i class="fa fa-tags" aria-hidden="true"></i></span>
+                        </div>
+                        <div class="flex-fill  text-center" data-toggle="tooltip" data-placement="top"
+                             title="点赞数">
+                            <span>{{blog.likeCount||0}}</span><br>
+                            <span><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mb-3">
+                    <a href="https://github.com/dorneal" target="_blank" class="h4 text-dark">
+                        <i data-toggle="tooltip" data-placement="top" title="我的github"
+                           class="fa fa-github"></i></a>
+                </div>
+                <div class="text-center card-footer">
+                    <input type="search" ng-model="keywords" name="keywords"
+                           ng-keypress="($event.which===13)?searchArticle():0"
+                           placeholder="搜索,回车确认"
+                           class="form-control font-weight-light">
+                </div>
+            </div>
+            <div class="p-3">
+                <span class="text-right blockquote-footer font-italic">&copy; 2018 neal <a
+                        href="https://baike.baidu.com/item/%E9%81%BF%E9%A3%8E%E6%B8%AF%E5%8E%9F%E5%88%99/588459?fr=aladdin"
+                        title="避风港原则" target="_blank" class="h-75">避风港原则</a></span>
+                <span class="text-right font-italic blockquote-footer"><a href="http://www.miitbeian.gov.cn/"
+                                                                          target="_blank">湘ICP备17017819号</a></span>
+                <span class="text-right font-italic blockquote-footer">
+                    <a target="_blank"
+                       href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=43030302000105">
+                        <img src="/images/beian.png" alt="湘公安网备"/>湘公安网备43030302000105号</a></span>
+            </div>
+        </aside>
+        <!-- 内容区域 -->
+        <section class="adjust-area mb-3 col-md-9">
+            <article>
+                <div class="card shadow-sm bg-white rounded ">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0" ng-bind-html="articleVo.column">
+                        </ol>
+                    </nav>
+                    <div class="p-3">
+                        <!-- 标题，属性 -->
+                        <div class="text-center mb-3">
+                            <h4>{{articleVo.article.title}}</h4>
+                            <p class="text-right blockquote-footer mb-0 font-italic text-muted">
+                                <span class="mr-1"> <i class="fa fa-calendar" aria-hidden="true"></i> {{articleVo.article.createTime|date:'yyyy-MM-dd'}}</span>
+                                <span class="text-black-50 mr-1"> / </span>
+                                <span class="mr-1"> <i class="fa fa-eye"
+                                                       aria-hidden="true"></i> {{watchNum}}</span>
+                                <span class="text-black-50 mr-1"> / </span>
+                                <span class="mr-1"> <i class="fa fa-commenting-o" aria-hidden="true"></i> {{commentNum}}</span>
+                                <span class="text-black-50 mr-1"> / </span>
+                                <span> <i class="fa fa-heart" aria-hidden="true"></i> {{likeNum}}</span>
+                                <span class="text-info ml-2">{{tagsColor[articleVo.article.articleStatus]}}</span>
+                            </p>
+                        </div>
+                        <!-- 正文 -->
+                        <div class="embed-responsive" ng-bind-html="articleVo.article.content">
+                        </div>
+                        <!-- 注明区 -->
+                        <div class="text-right">
+                            <p class="blockquote-footer font-italic text-muted">转载请注明出处</p>
+                        </div>
+                        <!-- 点赞区 -->
+                        <div class="pt-3 pb-3 text-center">
+                            <span class="text-muted h4"><i class="fa fa-heart" style="cursor: pointer;" id="like"
+                                                           ng-click="like()"
+                                                           ng-class="{'text-danger':isLike}"
+                                                           aria-hidden="true"></i></span>
+                        </div>
+                        <!-- 评论区 -->
+                        <div>
+                            <!-- 评论显示 -->
+                            <div>
+                                <h5>评论</h5>
+                                <div class="p-2">
+                                    <div ng-repeat="entity in comments">
+                                        <div class="border-bottom">
+                                            <p class="text-muted mb-0 w-100"><span class="text-info">{{entity.commentName}}</span><span> {{entity.commentTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                                <a href="javascript:void(0)" class="text-right">{{$index+1}} 楼</a></p>
+                                        </div>
+                                        <div class="p-1">
+                                            <p>{{entity.content}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h5>发表评论</h5>
+                                <div class="">
+                                    <p ng-if="visitor.visitorName!=null && visitor.visitorEmail!=null">welcome <span
+                                            class="text-primary">{{visitor.visitorName}}</span> &nbsp;&nbsp;your
+                                        email: <span class="text-info">{{visitor.visitorEmail}}</span>
+                                    </p>
+                                    <textarea class="form-control" id="" ng-model="comment.content" rows="3"></textarea>
+                                    <form class="form-inline mt-1">
+                                        <label class="sr-only" for="username"
+                                               ng-if="visitor.visitorName==null">Username</label>
+                                        <div class="input-group mb-2 mr-sm-2" ng-if="visitor.visitorName==null">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-user-circle"
+                                                                                 aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="text" class="form-control" id="username"
+                                                   ng-model="comment.commentName"
+                                                   placeholder="Username">
+                                        </div>
+                                        <label class="sr-only" for="email"
+                                               ng-if="visitor.visitorEmail==null">Email</label>
+                                        <div class="input-group mb-2 mr-sm-2" ng-if="visitor.visitorEmail==null">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-envelope"
+                                                                                 aria-hidden="true"></i></div>
+                                            </div>
+                                            <input type="email" class="form-control" id="email"
+                                                   ng-model="comment.commentEmail"
+                                                   placeholder="email">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-2" ng-click="publishComment()">
+                                            Submit
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </div>
+</section>
+<script src="../scripts/jquery-3.3.1.min.js"></script>
+<script src="../scripts/bootstrap.min.js"></script>
+<script src="../scripts/bootstrap.bundle.min.js"></script>
+<script src="../scripts/angular.min.js"></script>
+<script src="../scripts/customize/base.js"></script>
+<script src="../scripts/customize/service/blogService.js"></script>
+<script src="../scripts/customize/service/articleService.js"></script>
+<script src="../scripts/customize/service/commentService.js"></script>
+<script src="../scripts/customize/service/visitorService.js"></script>
+<script src="../scripts/customize/service/watchService.js"></script>
+<script src="../scripts/customize/service/likeService.js"></script>
+<script src="../scripts/customize/controller/baseController.js"></script>
+<script src="../scripts/customize/controller/contentController.js"></script>
+<script>
+    function toIndex(id) {
+        sessionStorage.setItem("columnId", id);
+        location.href = "../index.html";
+    }
+
+    $(function () {
+        $("[data-toggle='tooltip']").tooltip();
+    });
+</script>
+<script>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?d131e80dbe4e2a6df483fc811164f418";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="per.neal.blog.dao.TimingMapper">
+    <update id="updateTiming">
+        UPDATE tb_timing
+        <set>
+            <if test="workTime!=null">work_time=#{workTime},</if>
+            <if test="workStatus!=null">work_status=#{workStatus},</if>
+        </set>
+        WHERE article_id = #{articleId}
+    </update>
+    <select id="findByArticleId" resultType="per.neal.blog.entity.TbTiming">
+        SELECT id,article_id,work_status,work_time
+        FROM tb_timing
+        WHERE article_id = #{id}
+    </select>
+
+    <insert id="saveTiming">
+        INSERT INTO tb_timing(article_id, work_time, work_status)
+        VALUES (#{articleId}, #{workTime}, #{workStatus})
+    </insert>
+
+</mapper>
